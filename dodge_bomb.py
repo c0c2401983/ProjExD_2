@@ -48,6 +48,22 @@ def gameover(screen: pg.Surface) -> None:
     time.sleep(5)
 
 
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    kk_img1 = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_img2 = pg.transform.flip(kk_img1, True, False)
+    kk_dict = {
+        (0, 0): pg.transform.rotozoom(kk_img2, 0, 1.0),
+        (+5, 0): pg.transform.rotozoom(kk_img2, 0, 1.0),
+        (+5, -5): pg.transform.rotozoom(kk_img2, 45, 1.0),
+        (0, -5): pg.transform.rotozoom(kk_img2, 90, 1.0),
+        (-5, -5): pg.transform.rotozoom(kk_img1, 325, 1.0),
+        (-5, 0): pg.transform.rotozoom(kk_img1, 360, 1.0),
+        (-5, +5): pg.transform.rotozoom(kk_img1, 45, 1.0),
+        (0, +5): pg.transform.rotozoom(kk_img2, 270, 1.0),
+        (+5, +5): pg.transform.rotozoom(kk_img2, 325, 1.0), 
+    }
+    return kk_dict
+
 def init_bb_img() -> tuple[list[pg.Surface], list[int]]:
     """
     引数：なし
@@ -80,7 +96,7 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
     bb_imgs, bb_accs = init_bb_img()
-
+    kk_imgs = get_kk_imgs()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -108,7 +124,7 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]  # 横方向の移動量
                 sum_mv[1] += mv[1]  # 縦方向の移動量
-
+        kk_img = kk_imgs[tuple(sum_mv)]
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
