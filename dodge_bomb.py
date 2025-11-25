@@ -85,16 +85,21 @@ def init_bb_img() -> tuple[list[pg.Surface], list[int]]:
     return bb_imgs, bb_accs
 
 
-# def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
-#     def_x = org.x - dst.x  # 横方向の差を求める
-#     def_y = org.y - dst.y  # 縦方向の差を求める
-#     length = (def_x ** 2 + def_y ** 2) ** 0.5  # 以上の式から双方の距離を求める
-#     regular = 50 ** 0.5  
-#     if length < 300.0:  # 距離が300未満ならもとの方向に移動
-#         return current_xy
-#     new_x = def_x / length  * regular  # 正規化後の横方向のベクトル
-#     new_y = def_y / length  * regular  # 正規化後の縦方向のベクトル
-#     return (new_x, new_y)
+def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
+    """
+    引数：爆弾とこうかとんRect,爆弾の移動方向のタプル
+    戻り値：新しい爆弾の移動方向のタプル
+    こうかとんにむかって追尾するようになる
+    """
+    def_x = org.x - dst.x  # 横方向の差を求める
+    def_y = org.y - dst.y  # 縦方向の差を求める
+    length = (def_x ** 2 + def_y ** 2) ** 0.5  # 以上の式から双方の距離を求める
+    regular = 50 ** 0.5  
+    if length < 300.0:  # 距離が300未満ならもとの方向に移動
+        return current_xy
+    new_x = def_x / length  * regular  # 正規化後の横方向のベクトル
+    new_y = def_y / length  * regular  # 正規化後の縦方向のベクトル
+    return (new_x, new_y)
 
 
 def main():
