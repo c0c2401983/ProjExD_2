@@ -49,10 +49,14 @@ def gameover(screen: pg.Surface) -> None:
 
 
 def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    引数：なし
+    戻り値：移動量タプルと対応する画像Surface
+    """
     kk_img1 = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_img2 = pg.transform.flip(kk_img1, True, False)
     kk_dict = {
-        (0, 0): pg.transform.rotozoom(kk_img2, 0, 1.0),
+        (0, 0): pg.transform.rotozoom(kk_img2, 0, 1.0),  # 右から反時計回りに8方向の画像
         (+5, 0): pg.transform.rotozoom(kk_img2, 0, 1.0),
         (+5, -5): pg.transform.rotozoom(kk_img2, 45, 1.0),
         (0, -5): pg.transform.rotozoom(kk_img2, 90, 1.0),
@@ -63,6 +67,7 @@ def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
         (+5, +5): pg.transform.rotozoom(kk_img2, 325, 1.0), 
     }
     return kk_dict
+
 
 def init_bb_img() -> tuple[list[pg.Surface], list[int]]:
     """
@@ -75,9 +80,21 @@ def init_bb_img() -> tuple[list[pg.Surface], list[int]]:
         bb_img = pg.Surface((20*r, 20*r))
         pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
         bb_img.set_colorkey((0, 0, 0)) 
-        bb_imgs.append(bb_img)
+        bb_imgs.append(bb_img)  # 10段階の大きさの爆弾のリスト
     
     return bb_imgs, bb_accs
+
+
+# def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]) -> tuple[float, float]:
+#     def_x = org.x - dst.x  # 横方向の差を求める
+#     def_y = org.y - dst.y  # 縦方向の差を求める
+#     length = (def_x ** 2 + def_y ** 2) ** 0.5  # 以上の式から双方の距離を求める
+#     regular = 50 ** 0.5  
+#     if length < 300.0:  # 距離が300未満ならもとの方向に移動
+#         return current_xy
+#     new_x = def_x / length  * regular  # 正規化後の横方向のベクトル
+#     new_y = def_y / length  * regular  # 正規化後の縦方向のベクトル
+#     return (new_x, new_y)
 
 
 def main():
@@ -92,11 +109,11 @@ def main():
     bb_img.set_colorkey((0, 0, 0))  
     bb_rct = bb_img.get_rect()  # 爆弾Rect
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-    vx, vy = +5, +5  #爆弾の横速度, 縦速度
+    vx, vy = +5, +5  # 爆弾の横速度, 縦速度
     clock = pg.time.Clock()
     tmr = 0
-    bb_imgs, bb_accs = init_bb_img()
-    kk_imgs = get_kk_imgs()
+    bb_imgs, bb_accs = init_bb_img()  # 爆弾の画像と速さのリストを取得
+    kk_imgs = get_kk_imgs()  # こうかとん画像の取得
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -136,9 +153,11 @@ def main():
             vx *= -1
         if not tate:  # 縦方向にはみ出ていたら
             vy *= -1
-        avx = vx*bb_accs[min(tmr//500, 9)]
-        avy = vy*bb_accs[min(tmr//500, 9)]
-        bb_img = bb_imgs[min(tmr//500, 9)]
+            
+        avx = vx*bb_accs[min(tmr//500, 9)]  #10秒ごとに1段階ずつ横方向に早くなる
+        avy = vy*bb_accs[min(tmr//500, 9)]  #10秒ごとに1段階ずつ縦方向に早くなる
+        bb_img = bb_imgs[min(tmr//500, 9)]  #10秒ごとに爆弾が大きくなる
+        #avx, avy = calc_orientation(bb_rct, kk_rct,(avx,avy))
         bb_rct.width = bb_img.get_rect().width
         bb_rct.height = bb_img.get_rect().height
         bb_rct.move_ip(avx, avy)
