@@ -1,7 +1,7 @@
 import os
 import sys
 import pygame as pg
-
+import random
 
 WIDTH, HEIGHT = 1100, 650
 DELTA = {
@@ -15,10 +15,16 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("fig/pg_bg.jpg")    
+    bg_img = pg.image.load("fig/pg_bg.jpg")
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
+    bb_img = pg.Surface((20, 20))  # 空のSurface
+    pg.draw.circle(bb_img, (255, 0, 0), (10,  10), 10)  # 半径10の赤い円を描画
+    bb_img.set_colorkey((0, 0, 0))  
+    bb_rct = bb_img.get_rect()  # 爆弾Rect
+    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+    vx, vy = +5, +5  #爆弾の横速度, 縦速度
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -40,11 +46,13 @@ def main():
         #     sum_mv[0] += 5
         for key , mv in DELTA.items():
             if key_lst[key]:
-                sum_mv[0] += mv[0]
-                sum_mv[1] += mv[1]
-                
+                sum_mv[0] += mv[0]  # 横方向の移動量
+                sum_mv[1] += mv[1]  # 縦方向の移動量
+
         kk_rct.move_ip(sum_mv)
+        bb_rct.move_ip(vx, vy)
         screen.blit(kk_img, kk_rct)
+        screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
         clock.tick(50)
