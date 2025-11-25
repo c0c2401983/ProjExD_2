@@ -91,8 +91,8 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect, current_xy: tuple[float, float]
     戻り値：新しい爆弾の移動方向のタプル
     こうかとんにむかって追尾するようになる
     """
-    def_x = org.x - dst.x  # 横方向の差を求める
-    def_y = org.y - dst.y  # 縦方向の差を求める
+    def_x = dst.x - org.x  # 横方向の差を求める
+    def_y = dst.y - org.y  # 縦方向の差を求める
     length = (def_x ** 2 + def_y ** 2) ** 0.5  # 以上の式から双方の距離を求める
     regular = 50 ** 0.5  
     if length < 300.0:  # 距離が300未満ならもとの方向に移動
@@ -158,11 +158,12 @@ def main():
             vx *= -1
         if not tate:  # 縦方向にはみ出ていたら
             vy *= -1
-            
+        
+        vx, vy = calc_orientation(bb_rct, kk_rct,(vx,vy))
         avx = vx*bb_accs[min(tmr//500, 9)]  #10秒ごとに1段階ずつ横方向に早くなる
         avy = vy*bb_accs[min(tmr//500, 9)]  #10秒ごとに1段階ずつ縦方向に早くなる
         bb_img = bb_imgs[min(tmr//500, 9)]  #10秒ごとに爆弾が大きくなる
-        #avx, avy = calc_orientation(bb_rct, kk_rct,(avx,avy))
+        
         bb_rct.width = bb_img.get_rect().width
         bb_rct.height = bb_img.get_rect().height
         bb_rct.move_ip(avx, avy)
